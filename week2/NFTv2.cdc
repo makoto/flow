@@ -111,12 +111,10 @@ pub contract NonFungibleToken {
         // Function that mints a new NFT with a new ID
         // and deposits it in the recipients collection 
         // using their collection reference
-        pub fun mintNFT(num: Int, recipient: &AnyResource{NFTReceiver}) {
+        pub fun mintNFT(num: Int, recipient: &AnyResource{NFTReceiver}): [Int] {
             var a = 0
+            var ids: [Int] = []
             while a < num {
-                a = a + 1
-                log("a")
-                log(a)
                 // create a new NFT
                 var newNFT <- create NFT(initID: self.idCount)
                 // deposit it in the recipient's account using their reference
@@ -124,7 +122,10 @@ pub contract NonFungibleToken {
 
                 // change the id so that each ID is unique
                 self.idCount = self.idCount + UInt64(1)
+                ids[a] = Int(self.idCount)
+                a = a + 1
             }
+            return ids
         }
     }
 
@@ -139,3 +140,4 @@ pub contract NonFungibleToken {
         self.account.save(<-create NFTMinter(), to: /storage/NFTMinter)
 	}
 }
+ 
