@@ -25,8 +25,19 @@ transaction {
     execute {
         // Use the minter reference to mint an NFT, which deposits
         // the NFT into the collection that is sent as a parameter.
-        self.minterRef.mintNFT(recipient: self.receiverRef)
+        self.minterRef.mintNFT(num: 3, recipient: self.receiverRef)
 
         log("NFT Minted and deposited to Account 2's Collection")
+
+        let nftOwner = getAccount(0x01cf0e2f2f715450)
+
+        // Find the public Receiver capability for their Collection
+        let capability = nftOwner.getCapability(/public/NFTReceiver)!
+
+        // borrow a reference from the capability
+        let receiverRef = capability.borrow<&{NonFungibleToken.NFTReceiver}>()!
+
+        log("Account 2 NFTs")
+        log(receiverRef.getIDs())
     }
 }
