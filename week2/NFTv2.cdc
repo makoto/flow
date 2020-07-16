@@ -122,7 +122,7 @@ pub contract NonFungibleToken {
 
                 // change the id so that each ID is unique
                 self.idCount = self.idCount + UInt64(1)
-                ids[a] = Int(self.idCount)
+                ids.append(Int(self.idCount))
                 a = a + 1
             }
             return ids
