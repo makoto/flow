@@ -111,10 +111,17 @@ pub contract NonFungibleToken {
         // Function that mints a new NFT with a new ID
         // and deposits it in the recipients collection 
         // using their collection reference
-        pub fun mintNFT(num: Int, recipient: &AnyResource{NFTReceiver}): [Int] {
+        pub fun mintNFT(nfts: [Int], recipient: &AnyResource{NFTReceiver}): [Int] {
             var a = 0
             var ids: [Int] = []
-            while a < num {
+            if nfts.length == 0 {
+                var newNFT <- create NFT(initID: self.idCount)
+                recipient.deposit(token: <-newNFT)
+                self.idCount = self.idCount + UInt64(1)
+                return [Int(self.idCount)]
+            }
+
+            while a < nfts.length {
                 // create a new NFT
                 var newNFT <- create NFT(initID: self.idCount)
                 // deposit it in the recipient's account using their reference

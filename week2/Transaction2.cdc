@@ -27,13 +27,13 @@ transaction {
     execute {
         // Use the minter reference to mint an NFT, which deposits
         // the NFT into the collection that is sent as a parameter.
-        let result = self.minterRef.mintNFT(num: 3, recipient: self.receiverRef)
+        
 
         log("NFT Minted and deposited to Account 2's Collection")
 
-        log("Account 2 NFTs")
-
-        log(result)
+        log(self.minterRef.mintNFT(nfts: [], recipient: self.receiverRef))
+        log(self.minterRef.mintNFT(nfts: [1], recipient: self.receiverRef))
+        log(self.minterRef.mintNFT(nfts: [1,2], recipient: self.receiverRef))
 
         // Call the withdraw function on the sender's Collection
         // to move the NFT out of the collection
