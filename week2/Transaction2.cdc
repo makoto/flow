@@ -9,11 +9,11 @@ transaction {
 
     // The reference to the collection that will be receiving the NFT
     let receiverRef: &{NonFungibleToken.NFTReceiver}
-
     // The reference to the Minter resource stored in account storage
     let minterRef: &NonFungibleToken.NFTMinter
 
-    // let collectionRef: &NonFungibleToken.Collection
+    let collectionRef: &NonFungibleToken.Collection
+    let myCollections: &NonFungibleToken.Collection
     prepare(acct: AuthAccount) {
         // Get the owner's collection capability and borrow a reference
         self.receiverRef = acct.getCapability(/public/NFTReceiver)!
@@ -21,24 +21,22 @@ transaction {
         
         // Borrow a capability for the NFTMinter in storage
         self.minterRef = acct.borrow<&NonFungibleToken.NFTMinter>(from: /storage/NFTMinter)!
-        // self.collectionRef = acct.borrow<&NonFungibleToken.Collection>(from: /storage/NFTCollection)!
+        self.collectionRef = acct.borrow<&NonFungibleToken.Collection>(from: /storage/NFTCollection)!
+        let collection <- NonFungibleToken.createEmptyCollection()
+        acct.save<@NonFungibleToken.Collection>(<-collection, to: /storage/MyCollection)
+        self.myCollections = acct.borrow<&NonFungibleToken.Collection>(from: /storage/MyCollection)!
     }
 
     execute {
-        // Use the minter reference to mint an NFT, which deposits
-        // the NFT into the collection that is sent as a parameter.
-        
-
-        log("NFT Minted and deposited to Account 2's Collection")
-
-        log(self.minterRef.mintNFT(nfts: [], recipient: self.receiverRef))
-        log(self.minterRef.mintNFT(nfts: [1], recipient: self.receiverRef))
-        log(self.minterRef.mintNFT(nfts: [1,2], recipient: self.receiverRef))
-
-        // Call the withdraw function on the sender's Collection
-        // to move the NFT out of the collection
-        // let transferToken <- self.collectionRef.withdraw(withdrawID: 1)
-
+        let firstRound = self.minterRef.mintNFT(nfts: self.myCollections, recipient: self.receiverRef)
+        for element in firstRound {
+            log(element)
+            self.myCollections.deposit(token:<- self.collectionRef.withdraw(withdrawID: UInt64(element)))
+        }
+        for element in self.myCollections.getIDs() {
+            log(element)
+            let secondRound = self.minterRef.mintNFT(nfts: self.myCollections, recipient: self.receiverRef)
+        }
     }
 }
  
