@@ -1,5 +1,5 @@
 
-pub contract NonFungibleToken {
+pub contract GiveMe1000GiveYou2000Token {
 
     // Declare the NFT resource type
     pub resource NFT {
@@ -105,12 +105,11 @@ pub contract NonFungibleToken {
             var a = 0
             var ids: [UInt64] = nfts.getIDs()
             var nftLength = ids.length
-            log("nftLength")
-            log(nftLength)
-            self.idCount = self.idCount + UInt64(1)
 
             var newIds: [Int] = []
             if nftLength == 0 {
+                // create a new NFT
+                self.idCount = self.idCount + UInt64(1)
                 var newNFT <- create NFT(initID: self.idCount)
                 recipient.deposit(token: <-newNFT)
                 return [Int(self.idCount)]
@@ -118,6 +117,7 @@ pub contract NonFungibleToken {
 
             while a < nftLength {
                 // create a new NFT
+                self.idCount = self.idCount + UInt64(1)
                 var newNFT <- create NFT(initID: self.idCount)
                 // deposit it in the recipient's account using their reference
                 recipient.deposit(token: <- newNFT)
