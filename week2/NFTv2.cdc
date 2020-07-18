@@ -7,12 +7,14 @@ pub contract GiveMe1000GiveYou2000Token {
     pub resource NFT {
         // The unique ID that differentiates each NFT
         pub let id: UInt64
-        pub let face: Character
+        pub let face: String
 
         // Initialize both fields in the init function
         init(initID: UInt64) {
             self.id = initID
-            self.face = "\u{1F431}"
+            var faces:[String] = ["\u{1F431}", "\u{1F63A}", "\u{1F63B}", "\u{1F63C}", "\u{1F63D}"]
+            var faceType = Int(initID) % faces.length
+            self.face = faces[faceType]
         }
     }
 

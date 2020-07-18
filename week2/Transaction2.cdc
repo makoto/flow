@@ -33,7 +33,20 @@ transaction {
             let ids = self.minterRef.mintNFT(nfts: self.myCollections, recipient: self.receiverRef)
             var temp = 0
             var i = 0
-            let faces:[Character] = []
+            while i < ids.length {
+                temp = ids[i]
+                var j = i + 1
+                while j < ids.length {
+                    if (temp > ids[j]) {
+                        ids[i] = ids[j]
+                        ids[j] = temp
+                        temp = ids[i]
+                    }
+                    j = j + 1
+                }
+                i = i +1
+            }
+            let faces:[String] = []
             for element in ids {
                 if let token <- self.collectionRef.withdraw(withdrawID: UInt64(element)){
                     faces.append(token.face)
