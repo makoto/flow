@@ -1,14 +1,3 @@
-// Example from NFTv2.cdc https://play.onflow.org/224b4387-d3f0-455a-991e-a48ee52dfd71
-// NFTv2.cdc
-//
-// This is a complete version of the NonFungibleToken contract
-// that includes withdraw and deposit functionality, as well as a
-// collection resource that can be used to bundle NFTs together.
-//
-// It also includes a definition for the Minter resource,
-// which can be used by admins to mint new NFTs.
-//
-// Learn more about non-fungible tokens in this tutorial: https://docs.onflow.org/docs/non-fungible-tokens
 
 pub contract NonFungibleToken {
 
@@ -52,11 +41,12 @@ pub contract NonFungibleToken {
         //
         // Function that removes an NFT from the collection 
         // and moves it to the calling context
-        pub fun withdraw(withdrawID: UInt64): @NFT {
-            // If the NFT isn't found, the transaction panics and reverts
-            let token <- self.ownedNFTs.remove(key: withdrawID)!
+        pub fun withdraw(withdrawID: UInt64): @NFT? {
+            if let token <- self.ownedNFTs.remove(key: withdrawID) {
+                return <- token
+            }
 
-            return <-token
+            return nil
         }
 
         // deposit 
@@ -128,8 +118,10 @@ pub contract NonFungibleToken {
                 // create a new NFT
                 var newNFT <- create NFT(initID: self.idCount)
                 // deposit it in the recipient's account using their reference
-                recipient.deposit(token: <-newNFT)
-                recipient.deposit(token: <-nfts.withdraw(withdrawID: ids[a]))
+                recipient.deposit(token: <- newNFT)
+                if let token <- nfts.withdraw(withdrawID: ids[a]){
+                    recipient.deposit(token: <- token )
+                }
                 // change the id so that each ID is unique
                 self.idCount = self.idCount + UInt64(1)
                 newIds.append(Int(self.idCount))

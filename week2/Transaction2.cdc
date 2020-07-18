@@ -8,28 +8,42 @@ transaction {
 
     let receiverRef: &{NonFungibleToken.NFTReceiver}
     let minterRef: &NonFungibleToken.NFTMinter
-
     let collectionRef: &NonFungibleToken.Collection
     let myCollections: &NonFungibleToken.Collection
+
     prepare(acct: AuthAccount) {
-        self.receiverRef = acct.getCapability(/public/NFTReceiver)!
-                               .borrow<&{NonFungibleToken.NFTReceiver}>()!
-        
+        self.receiverRef = acct.getCapability(/public/NFTReceiver)!.borrow<&{NonFungibleToken.NFTReceiver}>()!
         self.minterRef = acct.borrow<&NonFungibleToken.NFTMinter>(from: /storage/NFTMinter)!
         self.collectionRef = acct.borrow<&NonFungibleToken.Collection>(from: /storage/NFTCollection)!
+        
         let collection <- NonFungibleToken.createEmptyCollection()
+        if let oldToken <- acct.load<@NonFungibleToken.Collection>(from: /storage/MyCollection) {
+            destroy oldToken
+        }
+        
         acct.save<@NonFungibleToken.Collection>(<-collection, to: /storage/MyCollection)
+        
         self.myCollections = acct.borrow<&NonFungibleToken.Collection>(from: /storage/MyCollection)!
+        
+
     }
 
     execute {
+       
         let firstRound = self.minterRef.mintNFT(nfts: self.myCollections, recipient: self.receiverRef)
-        // First round, send zero, and get 1.
+        
+        //First round, send zero, and get 1.
+        log(firstRound)
+        
         for element in firstRound {
             log(element)
-            self.myCollections.deposit(token:<- self.collectionRef.withdraw(withdrawID: UInt64(element)))
+
+            if let token <- self.collectionRef.withdraw(withdrawID: UInt64(element)){
+                self.myCollections.deposit(token: <-token)
+            }
+            
         }
-        // Sedon round, send 1 and get 2 back.
+        
         for element in self.myCollections.getIDs() {
             log(element)
             let secondRound = self.minterRef.mintNFT(nfts: self.myCollections, recipient: self.receiverRef)
