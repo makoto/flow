@@ -29,7 +29,7 @@ transaction {
     execute {
         var a = 1
         log("🐱 Kities go brrrrrrr")
-        while a <= 6 {
+        while a <= 7 {
             let ids = self.minterRef.mintNFT(nfts: self.myCollections, recipient: self.receiverRef)
             var temp = 0
             var i = 0
@@ -46,10 +46,10 @@ transaction {
                 }
                 i = i +1
             }
-            let faces:[String] = []
+            var faces = ""
             for element in ids {
                 if let token <- self.collectionRef.withdraw(withdrawID: UInt64(element)){
-                    faces.append(token.face)
+                    faces = faces.concat(token.face)
                     self.myCollections.deposit(token: <-token)
                 } 
             }
