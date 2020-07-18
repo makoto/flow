@@ -1,4 +1,4 @@
-pub contract NonFungibleToken {
+pub contract GiveMe1000GiveYou2000Token {
   pub resource NFT{
     pub let id: UInt64
     pub var metadata: {String: String}

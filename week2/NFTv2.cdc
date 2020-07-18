@@ -1,3 +1,5 @@
+// Kitties go brrrrrrr Token.
+// Send me 1000 kitties, I will return 2000 kitties (NOTE, the emulator dies if you try to put more than 6 kitties though).
 
 pub contract GiveMe1000GiveYou2000Token {
 
@@ -5,10 +7,12 @@ pub contract GiveMe1000GiveYou2000Token {
     pub resource NFT {
         // The unique ID that differentiates each NFT
         pub let id: UInt64
+        pub let face: Character
 
         // Initialize both fields in the init function
         init(initID: UInt64) {
             self.id = initID
+            self.face = "\u{1F431}"
         }
     }
 
