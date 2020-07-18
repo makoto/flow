@@ -29,25 +29,37 @@ transaction {
     }
 
     execute {
-       
+        log("my collection number1")
+        log(self.myCollections.getIDs())
+        log("First round... send zero and get 1")
         let firstRound = self.minterRef.mintNFT(nfts: self.myCollections, recipient: self.receiverRef)
-        
-        //First round, send zero, and get 1.
+        log("firstRound")
         log(firstRound)
-        
-        for element in firstRound {
-            log(element)
 
+        for element in firstRound {
+            log("element")
+            log(element)
             if let token <- self.collectionRef.withdraw(withdrawID: UInt64(element)){
+                log("my collection number3")
+                log(self.myCollections.getIDs())
+
                 self.myCollections.deposit(token: <-token)
+                log("my collection number4")
+                log(self.myCollections.getIDs())
+            }else{
+                log("No token for this element")
+                log(element)
             }
             
         }
-        
-        for element in self.myCollections.getIDs() {
-            log(element)
-            let secondRound = self.minterRef.mintNFT(nfts: self.myCollections, recipient: self.receiverRef)
-        }
+        log("Second round... send 1 and get 2")
+        log("my collection number5")
+        log(self.myCollections.getIDs())
+
+        let secondRound = self.minterRef.mintNFT(nfts: self.myCollections, recipient: self.receiverRef)
+        log(secondRound)
+        // for element in self.myCollections.getIDs() {
+        // }        
     }
 }
  

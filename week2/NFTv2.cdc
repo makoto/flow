@@ -93,7 +93,7 @@ pub contract NonFungibleToken {
         pub var idCount: UInt64
 
         init() {
-            self.idCount = 1
+            self.idCount = 0
         }
 
         // mintNFT 
@@ -105,12 +105,14 @@ pub contract NonFungibleToken {
             var a = 0
             var ids: [UInt64] = nfts.getIDs()
             var nftLength = ids.length
+            log("nftLength")
+            log(nftLength)
+            self.idCount = self.idCount + UInt64(1)
 
             var newIds: [Int] = []
             if nftLength == 0 {
                 var newNFT <- create NFT(initID: self.idCount)
                 recipient.deposit(token: <-newNFT)
-                self.idCount = self.idCount + UInt64(1)
                 return [Int(self.idCount)]
             }
 
@@ -122,8 +124,6 @@ pub contract NonFungibleToken {
                 if let token <- nfts.withdraw(withdrawID: ids[a]){
                     recipient.deposit(token: <- token )
                 }
-                // change the id so that each ID is unique
-                self.idCount = self.idCount + UInt64(1)
                 newIds.append(Int(self.idCount))
                 newIds.append(Int(ids[a]))
                 a = a + 1
