@@ -1,0 +1,38 @@
+import React, {useState, useEffect} from "react"
+import * as fcl from "@onflow/fcl"
+
+export default function TransactionOne() {
+  const [status, setStatus] = useState("Not Started")
+  const runTransaction = async e => {
+    e.preventDefault()
+    setStatus("Resolving...")
+    
+    const response = await fcl.send([
+      fcl.transaction`
+        transaction {
+          execute {
+            log("A transaction happened")
+          }
+        }
+      `,
+      fcl.proposer(fcl.currentUser().authorization),
+      fcl.payer(fcl.currentUser().authorization),
+    ])
+
+    setStatus("Transaction Sent, Waiting for Confirmation")
+
+    const unsub = fcl.tx(response).subscribe(transaction => {
+      if (fcl.tx.isSealed(transaction)) {
+        setStatus("Transaction Confirmed: Is Sealed")
+        unsub()
+      }
+    })
+  }
+
+  return (
+    <div>
+      <button onClick={runTransaction}>Run Transaction</button>
+      <pre>{status}</pre>
+    </div>
+  )
+}
